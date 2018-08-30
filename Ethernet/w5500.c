@@ -55,11 +55,7 @@
 #include "w5500.h"
 
 #define _W5500_SPI_VDM_OP_          0x00
-#define _W5500_SPI_FDM_OP_LEN1_     0x01
-#define _W5500_SPI_FDM_OP_LEN2_     0x02
-#define _W5500_SPI_FDM_OP_LEN4_     0x03
 
-#if   (_WIZCHIP_ == 5500)
 ////////////////////////////////////////////////////
 
 uint8_t  WIZCHIP_READ(uint32_t AddrSel)
@@ -125,7 +121,6 @@ void     WIZCHIP_WRITE(uint32_t AddrSel, uint8_t wb )
 void     WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 {
    uint8_t spi_data[3];
-   uint16_t i;
 
    WIZCHIP_CRITICAL_ENTER();
    WIZCHIP.CS._select();
@@ -137,7 +132,7 @@ void     WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x00FF0000) >> 16);
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x0000FF00) >>  8);
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x000000FF) >>  0);
-		for(i = 0; i < len; i++)
+		for(uint16_t i = 0; i < len; i++)
 		   pBuf[i] = WIZCHIP.IF.SPI._read_byte();
    }
    else																// burst operation
@@ -156,7 +151,6 @@ void     WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 void     WIZCHIP_WRITE_BUF(uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 {
    uint8_t spi_data[3];
-   uint16_t i;
 
    WIZCHIP_CRITICAL_ENTER();
    WIZCHIP.CS._select();
@@ -168,7 +162,7 @@ void     WIZCHIP_WRITE_BUF(uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x00FF0000) >> 16);
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x0000FF00) >>  8);
 		WIZCHIP.IF.SPI._write_byte((AddrSel & 0x000000FF) >>  0);
-		for(i = 0; i < len; i++)
+		for(uint16_t i = 0; i < len; i++)
 			WIZCHIP.IF.SPI._write_byte(pBuf[i]);
    }
    else									// burst operation
@@ -187,7 +181,7 @@ void     WIZCHIP_WRITE_BUF(uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 
 uint16_t getSn_TX_FSR(uint8_t sn)
 {
-   uint16_t val=0,val1=0;
+   uint16_t val=0,val1;
 
    do
    {
@@ -205,7 +199,7 @@ uint16_t getSn_TX_FSR(uint8_t sn)
 
 uint16_t getSn_RX_RSR(uint8_t sn)
 {
-   uint16_t val=0,val1=0;
+   uint16_t val=0,val1;
 
    do
    {
@@ -222,46 +216,34 @@ uint16_t getSn_RX_RSR(uint8_t sn)
 
 void wiz_send_data(uint8_t sn, uint8_t *wizdata, uint16_t len)
 {
-   uint16_t ptr = 0;
-   uint32_t addrsel = 0;
-
    if(len == 0)  return;
-   ptr = getSn_TX_WR(sn);
-   //M20140501 : implict type casting -> explict type casting
-   //addrsel = (ptr << 8) + (WIZCHIP_TXBUF_BLOCK(sn) << 3);
-   addrsel = ((uint32_t)ptr << 8) + (WIZCHIP_TXBUF_BLOCK(sn) << 3);
+   uint16_t ptr = getSn_TX_WR(sn);
+   uint32_t addrsel = ((uint32_t)ptr << 8) + (WIZCHIP_TXBUF_BLOCK(sn) << 3);
    //
    WIZCHIP_WRITE_BUF(addrsel,wizdata, len);
-   
+
    ptr += len;
    setSn_TX_WR(sn,ptr);
 }
 
 void wiz_recv_data(uint8_t sn, uint8_t *wizdata, uint16_t len)
 {
-   uint16_t ptr = 0;
-   uint32_t addrsel = 0;
-   
-   if(len == 0) return;
-   ptr = getSn_RX_RD(sn);
+  if(len == 0) return;
+   uint16_t ptr = getSn_RX_RD(sn);
    //M20140501 : implict type casting -> explict type casting
    //addrsel = ((ptr << 8) + (WIZCHIP_RXBUF_BLOCK(sn) << 3);
-   addrsel = ((uint32_t)ptr << 8) + (WIZCHIP_RXBUF_BLOCK(sn) << 3);
+   uint32_t addrsel = ((uint32_t)ptr << 8) + (WIZCHIP_RXBUF_BLOCK(sn) << 3);
    //
    WIZCHIP_READ_BUF(addrsel, wizdata, len);
    ptr += len;
-   
+
    setSn_RX_RD(sn,ptr);
 }
 
-
 void wiz_recv_ignore(uint8_t sn, uint16_t len)
 {
-   uint16_t ptr = 0;
-
-   ptr = getSn_RX_RD(sn);
+   uint16_t ptr = getSn_RX_RD(sn);
    ptr += len;
    setSn_RX_RD(sn,ptr);
 }
 
-#endif
