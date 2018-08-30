@@ -367,9 +367,7 @@ int8_t parseDNSMSG(struct dhdr * pdhdr, uint8_t * pbuf, uint8_t * ip_from_dns)
 	for (i = 0; i < pdhdr->qdcount; i++)
 	{
 		cp = dns_question(msg, cp);
-   #ifdef _DNS_DEUBG_
-      printf("MAX_DOMAIN_NAME is too small, it should be redfine in dns.h"
-   #endif
+		PRINTF("MAX_DOMAIN_NAME is too small, it should be redfine in dns.h"
 		if(!cp) return -1;
 	}
 
@@ -377,9 +375,7 @@ int8_t parseDNSMSG(struct dhdr * pdhdr, uint8_t * pbuf, uint8_t * ip_from_dns)
 	for (i = 0; i < pdhdr->ancount; i++)
 	{
 		cp = dns_answer(msg, cp, ip_from_dns);
-   #ifdef _DNS_DEUBG_
-      printf("MAX_DOMAIN_NAME is too small, it should be redfine in dns.h"
-   #endif
+		PRINTF("MAX_DOMAIN_NAME is too small, it should be redfine in dns.h"
 		if(!cp) return -1;
 	}
 
@@ -513,9 +509,7 @@ int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns)
    // Socket open
    socket(DNS_SOCKET, Sn_MR_UDP, 0, 0);
 
-#ifdef _DNS_DEBUG_
-	printf("> DNS Query to DNS Server : %d.%d.%d.%d\r\n", dns_ip[0], dns_ip[1], dns_ip[2], dns_ip[3]);
-#endif
+	PRINTF("> DNS Query to DNS Server : %d.%d.%d.%d\r\n", dns_ip[0], dns_ip[1], dns_ip[2], dns_ip[3]);
    
 	len = dns_makequery(0, (char *)name, pDNSMSG, MAX_DNS_BUF_SIZE);
 	sendto(DNS_SOCKET, pDNSMSG, len, dns_ip, IPPORT_DOMAIN);
@@ -526,9 +520,7 @@ int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns)
 		{
 			if (len > MAX_DNS_BUF_SIZE) len = MAX_DNS_BUF_SIZE;
 			len = recvfrom(DNS_SOCKET, pDNSMSG, len, ip, &port);
-      #ifdef _DNS_DEBUG_
-	      printf("> Receive DNS message from %d.%d.%d.%d(%d). len = %d\r\n", ip[0], ip[1], ip[2], ip[3],port,len);
-      #endif
+			PRINTF("> Receive DNS message from %d.%d.%d.%d(%d). len = %d\r\n", ip[0], ip[1], ip[2], ip[3],port,len);
          ret = parseDNSMSG(&dhp, pDNSMSG, ip_from_dns);
 			break;
 		}
@@ -536,16 +528,12 @@ int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns)
 		ret_check_timeout = check_DNS_timeout();
 		if (ret_check_timeout < 0) {
 
-#ifdef _DNS_DEBUG_
-			printf("> DNS Server is not responding : %d.%d.%d.%d\r\n", dns_ip[0], dns_ip[1], dns_ip[2], dns_ip[3]);
-#endif
+			PRINTF("> DNS Server is not responding : %d.%d.%d.%d\r\n", dns_ip[0], dns_ip[1], dns_ip[2], dns_ip[3]);
 			return 0; // timeout occurred
 		}
 		else if (ret_check_timeout == 0) {
 
-#ifdef _DNS_DEBUG_
-			printf("> DNS Timeout\r\n");
-#endif
+			PRINTF("> DNS Timeout\r\n");
 			sendto(DNS_SOCKET, pDNSMSG, len, dns_ip, IPPORT_DOMAIN);
 		}
 	}

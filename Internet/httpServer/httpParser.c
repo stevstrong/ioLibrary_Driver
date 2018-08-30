@@ -69,15 +69,11 @@ void make_http_response_head(
 	else if (type == PTYPE_WOFF)	head = RES_WOFFHEAD_OK;
 	else if (type == PTYPE_EOT)		head = RES_EOTHEAD_OK;
 	else if (type == PTYPE_SVG)		head = RES_SVGHEAD_OK;
-#ifdef _HTTPPARSER_DEBUG_
 	else
 	{
 		head = NULL;
-		printf("\r\n\r\n-MAKE HEAD UNKNOWN-\r\n");
+		PRINTF("\r\n\r\n-MAKE HEAD UNKNOWN-\r\n");
 	}
-#else
-	else head = NULL;
-#endif	
 
 	sprintf(tmp, "%ld", len);
 	strcpy(buf, head);
@@ -191,9 +187,7 @@ uint8_t * get_http_param_value(
 			replacetochar(name, '+', ' ');
 		}
 	}
-#ifdef _HTTPPARSER_DEBUG_
-	printf("  %s=%s",param_name,name);
-#endif	
+	PRINTF("  %s=%s",param_name,name);
 
 	return name;
 }
@@ -238,7 +232,7 @@ uint8_t * get_http_param_value(char* uri, char* param_name)
 			replacetochar(ret, '+' ,' ');
 			//ret[len] = 0;
 			//ret[strlen((int8*)ret)] = 0;
-			//printf("len=%d\r\n",len);
+			//PRINTF("len=%d\r\n",len);
 		}
 		else
 		{
@@ -249,9 +243,7 @@ uint8_t * get_http_param_value(char* uri, char* param_name)
 	{
 		return 0;
 	}
-#ifdef _HTTPPARSER_DEBUG_
-	printf("  %s=%s\r\n", param_name, ret);
-#endif
+	PRINTF("  %s=%s\r\n", param_name, ret);
 	return ret;
 }
 #endif
@@ -270,9 +262,7 @@ uint8_t * get_http_uri_name(uint8_t * uri)
 
 	if(strcmp((char *)uri_name,"/")) uri_name++;
 
-#ifdef _HTTPPARSER_DEBUG_
-	printf("  uri_name = %s\r\n", uri_name);
-#endif	
+	PRINTF("  uri_name = %s\r\n", uri_name);
 
 	return uri_name;
 }
@@ -280,19 +270,16 @@ uint8_t * get_http_uri_name(uint8_t * uri)
 
 uint8_t get_http_uri_name(uint8_t * uri, uint8_t * uri_buf)
 {
-	uint8_t * uri_ptr;
 	if(!uri) return 0;
 
 	strcpy((char *)uri_buf, (char *)uri);
 
-	uri_ptr = (uint8_t *)strtok((char *)uri_buf, " ?");
+	uint8_t * uri_ptr = (uint8_t *)strtok((char *)uri_buf, " ?");
 
 	if(strcmp((char *)uri_ptr,"/")) uri_ptr++;
 	strcpy((char *)uri_buf, (char *)uri_ptr);
 
-#ifdef _HTTPPARSER_DEBUG_
-	printf("  uri_name = %s\r\n", uri_buf);
-#endif
+	PRINTF("  uri_name = %s\r\n", uri_buf);
 
 	return 1;
 }

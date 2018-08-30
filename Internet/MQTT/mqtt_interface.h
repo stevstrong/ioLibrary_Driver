@@ -105,13 +105,13 @@ void messageArrived(MessageData* md)
 	{
 		memcpy(testbuffer,(char*)message->payload,(int)message->payloadlen);
 		*(testbuffer + (int)message->payloadlen + 1) = "\n";
-		printf("%s\r\n",testbuffer);
+		PRINTF("%s\r\n",testbuffer);
 	}
 
 	if (opts.nodelimiter)
-		printf("%.*s", (int)message->payloadlen, (char*)message->payload);
+		PRINTF("%.*s", (int)message->payloadlen, (char*)message->payload);
 	else
-		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts.delimiter);
+		PRINTF("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts.delimiter);
 }
 
 
@@ -142,19 +142,19 @@ int main(void)
 	unsigned char buf[100];
 	//Usart initialization for Debug.
 	USART1Initialze();
-		printf("USART initialized.\n\r");
+		PRINTF("USART initialized.\n\r");
 
 	I2C1Initialize();
-		printf("I2C initialized.\n\r");
+		PRINTF("I2C initialized.\n\r");
 
 	MACEEP_Read(mac_address,0xfa,6);
 
-	printf("Mac address\n\r");
+	PRINTF("Mac address\n\r");
 	for(i = 0 ; i < 6 ; i++)
 	{
-		printf("%02x ",mac_address[i]);
+		PRINTF("%02x ",mac_address[i]);
 	}
-	printf("\n\r");
+	PRINTF("\n\r");
 
 	//LED initialization.
 	led_initialize();
@@ -165,10 +165,10 @@ int main(void)
 
 	//W5500 initialization.
 	W5500HardwareInitilize();
-		printf("W5500 hardware interface initialized.\n\r");
+		PRINTF("W5500 hardware interface initialized.\n\r");
 
 	W5500Initialze();
-		printf("W5500 IC initialized.\n\r");
+		PRINTF("W5500 IC initialized.\n\r");
 
 	//Set network informations
 	wizchip_setnetinfo(&gWIZNETINFO);
@@ -195,12 +195,12 @@ int main(void)
 	data.cleansession = 1;
 
 	rc = MQTTConnect(&c, &data);
-	printf("Connected %d\r\n", rc);
+	PRINTF("Connected %d\r\n", rc);
 	opts.showtopics = 1;
 
-	printf("Subscribing to %s\r\n", "hello/wiznet");
+	PRINTF("Subscribing to %s\r\n", "hello/wiznet");
 	rc = MQTTSubscribe(&c, "hello/wiznet", opts.qos, messageArrived);
-	printf("Subscribed %d\r\n", rc);
+	PRINTF("Subscribed %d\r\n", rc);
 
     while(1)
     {

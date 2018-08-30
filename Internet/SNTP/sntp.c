@@ -288,9 +288,7 @@ int8_t SNTP_run(datetime *time)
 				if((ntp_retry_cnt % 0xFFF) == 0) //wait time
 				{
 					sendto(NTP_SOCKET,ntpmessage,sizeof(ntpmessage),NTPformat.dstaddr,ntp_port);
-#ifdef _SNTP_DEBUG_
-					printf("ntp retry: %d\r\n", ntp_retry_cnt);
-#endif
+					PRINTF("ntp retry: %d\r\n", ntp_retry_cnt);
 					ntp_retry_cnt++;
 				}
 			}
@@ -298,9 +296,7 @@ int8_t SNTP_run(datetime *time)
 		else //ntp retry fail
 		{
 			ntp_retry_cnt=0;
-#ifdef _SNTP_DEBUG_
-			printf("ntp retry failed!\r\n");
-#endif
+			PRINTF("ntp retry failed!\r\n");
 			close(NTP_SOCKET);
 		}
 		break;

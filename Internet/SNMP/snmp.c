@@ -99,9 +99,7 @@ uint32_t getSNMPTimeTick(void)
  */
 void snmpd_init(uint8_t * managerIP, uint8_t * agentIP, uint8_t sn_agent, uint8_t sn_trap)
 {
-#ifdef _SNMP_DEBUG_
-    printf("\r\n - SNMP : Start SNMP Agent Daemon\r\n");
-#endif
+    PRINTF("\r\n - SNMP : Start SNMP Agent Daemon\r\n");
     SOCK_SNMP_AGENT = sn_agent;
     SOCK_SNMP_TRAP = sn_trap;
 
@@ -190,9 +188,7 @@ int32_t snmpd_run(void)
 		case SOCK_CLOSED :
 			if((ret = socket(SOCK_SNMP_AGENT, Sn_MR_UDP, PORT_SNMP_AGENT, 0x00)) != SOCK_SNMP_AGENT)
 				return ret;
-#ifdef _SNMP_DEBUG_
-			printf(" - [%d] UDP Socket for SNMP Agent, port [%d]\r\n", SOCK_SNMP_AGENT, PORT_SNMP_AGENT);
-#endif
+			PRINTF(" - [%d] UDP Socket for SNMP Agent, port [%d]\r\n", SOCK_SNMP_AGENT, PORT_SNMP_AGENT);
 			break;
 
 		default :
@@ -890,23 +886,23 @@ void dumpCode(uint8_t* header, uint8_t* tail, uint8_t *buff, int32_t len)
 {
 	int i;
 
-	printf((char const*)header);
+	PRINTF((char const*)header);
 
 	for (i=0; i<len; i++)
 	{
-		if ( i%16==0 )	printf("0x%04x : ", i);
-		printf("%02x ",buff[i]);
+		if ( i%16==0 )	PRINTF("0x%04x : ", i);
+		PRINTF("%02x ",buff[i]);
 
 		if ( i%16-15==0 )
 		{
 			int j;
-			printf("  ");
+			PRINTF("  ");
 			for (j=i-15; j<=i; j++)
 			{
-				if ( isprint(buff[j]) )	printf("%c", buff[j]);
-				else					printf(".");
+				if ( isprint(buff[j]) )	PRINTF("%c", buff[j]);
+				else					PRINTF(".");
 			}
-			printf("\r\n");
+			PRINTF("\r\n");
 		}
 	}
 
@@ -914,14 +910,14 @@ void dumpCode(uint8_t* header, uint8_t* tail, uint8_t *buff, int32_t len)
 	{
 		int j;
 		int spaces=(len-i+16-i%16)*3+2;
-		for (j=0; j<spaces; j++) 	printf(" ");
+		for (j=0; j<spaces; j++) 	PRINTF(" ");
 		for (j=i-i%16; j<len; j++)
 		{
-			if ( isprint(buff[j]) )	printf("%c", buff[j]);
-			else					printf(".");
+			if ( isprint(buff[j]) )	PRINTF("%c", buff[j]);
+			else					PRINTF(".");
 		}
 	}
-	printf((char const*)tail);
+	PRINTF((char const*)tail);
 }
 #endif
 

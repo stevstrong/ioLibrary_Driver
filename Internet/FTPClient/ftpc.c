@@ -46,25 +46,25 @@ uint8_t ftpc_run(uint8_t * dbuf)
     {
     	case SOCK_ESTABLISHED :
     		if(!connect_state_control_ftpc){
-    			printf("%d:FTP Connected\r\n", CTRL_SOCK);
+    			PRINTF("%d:FTP Connected\r\n", CTRL_SOCK);
     			strcpy(ftpc.workingdir, "/");
     			connect_state_control_ftpc = 1;
     		}
     		if(gMenuStart){
 				gMenuStart = 0;
-				printf("\r\n----------------------------------------\r\n");
-				printf("Press menu key\r\n");
-				printf("----------------------------------------\r\n");
-				printf("1> View FTP Server Directory\r\n");
-				printf("2> View My Directory\r\n");
-				printf("3> Sets the type of file to be transferred. Current state : %s\r\n", (ftpc.type==ASCII_TYPE)?"Ascii":"Binary");
-				printf("4> Sets Data Connection. Current state : %s\r\n", (ftpc.dsock_mode==ACTIVE_MODE)?"Active":"Passive");
-				printf("5> Put File to Server\r\n");
-				printf("6> Get File from Server\r\n");
+				PRINTF("\r\n----------------------------------------\r\n");
+				PRINTF("Press menu key\r\n");
+				PRINTF("----------------------------------------\r\n");
+				PRINTF("1> View FTP Server Directory\r\n");
+				PRINTF("2> View My Directory\r\n");
+				PRINTF("3> Sets the type of file to be transferred. Current state : %s\r\n", (ftpc.type==ASCII_TYPE)?"Ascii":"Binary");
+				PRINTF("4> Sets Data Connection. Current state : %s\r\n", (ftpc.dsock_mode==ACTIVE_MODE)?"Active":"Passive");
+				PRINTF("5> Put File to Server\r\n");
+				PRINTF("6> Get File from Server\r\n");
 #if defined(F_FILESYSTEM)
-				printf("7> Delete My File\r\n");
+				PRINTF("7> Delete My File\r\n");
 #endif
-				printf("----------------------------------------\r\n");
+				PRINTF("----------------------------------------\r\n");
 				while(1){
 					msg_c=ftp_getc();
 					if(msg_c=='1'){
@@ -125,18 +125,18 @@ uint8_t ftpc_run(uint8_t * dbuf)
 					else if(msg_c=='2'){
 #if defined(F_FILESYSTEM)
 						scan_files(ftpc.workingdir, dbuf, (int *)&size);
-						printf("\r\n%s\r\n", dbuf);
+						PRINTF("\r\n%s\r\n", dbuf);
 #else
 						if (strncmp(ftpc.workingdir, "/$Recycle.Bin", sizeof("/$Recycle.Bin")) != 0)
 							size = sprintf(dbuf, "drwxr-xr-x 1 ftp ftp 0 Dec 31 2014 $Recycle.Bin\r\n-rwxr-xr-x 1 ftp ftp 512 Dec 31 2014 test.txt\r\n");
-						printf("\r\n%s\r\n", dbuf);
+						PRINTF("\r\n%s\r\n", dbuf);
 #endif
 						gMenuStart = 1;
 						break;
 					}
 					else if(msg_c=='3'){
-						printf("1> ASCII\r\n");
-						printf("2> BINARY\r\n");
+						PRINTF("1> ASCII\r\n");
+						PRINTF("2> BINARY\r\n");
 						while(1){
 							msg_c=ftp_getc();
 							if(msg_c=='1'){
@@ -152,14 +152,14 @@ uint8_t ftpc_run(uint8_t * dbuf)
 								break;
 							}
 							else{
-								printf("\r\nRetry...\r\n");
+								PRINTF("\r\nRetry...\r\n");
 							}
 						}
 						break;
 					}
 					else if(msg_c=='4'){
-						printf("1> ACTIVE\r\n");
-						printf("2> PASSIVE\r\n");
+						PRINTF("1> ACTIVE\r\n");
+						PRINTF("2> PASSIVE\r\n");
 						while(1){
 							msg_c=ftp_getc();
 							if(msg_c=='1'){
@@ -171,7 +171,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 								break;
 							}
 							else{
-								printf("\r\nRetry...\r\n");
+								PRINTF("\r\nRetry...\r\n");
 							}
 						}
 						gMenuStart = 1;
@@ -179,20 +179,20 @@ uint8_t ftpc_run(uint8_t * dbuf)
 					}
 #if defined(F_FILESYSTEM)
 					else if(msg_c=='7'){
-						printf(">del filename?");
+						PRINTF(">del filename?");
 						sprintf(ftpc.filename, "/%s\r\n", User_Keyboard_MSG());
 						if (f_unlink((const char *)ftpc.filename) != 0){
-							printf("\r\nCould not delete.\r\n");
+							PRINTF("\r\nCould not delete.\r\n");
 						}
 						else{
-							printf("\r\nDeleted.\r\n");
+							PRINTF("\r\nDeleted.\r\n");
 						}
 						gMenuStart = 1;
 						break;
 					}
 #endif
 					else{
-						printf("\r\nRetry...\r\n");
+						PRINTF("\r\nRetry...\r\n");
 					}
 				}
 			}
@@ -204,17 +204,17 @@ uint8_t ftpc_run(uint8_t * dbuf)
 						send(CTRL_SOCK, (uint8_t *)dat, strlen(dat));
 						break;
 					case f_put:
-						printf(">put file name?");
+						PRINTF(">put file name?");
 						sprintf(dat,"STOR %s\r\n", User_Keyboard_MSG());
 						send(CTRL_SOCK, (uint8_t *)dat, strlen(dat));
 						break;
 					case f_get:
-						printf(">get file name?");
+						PRINTF(">get file name?");
 						sprintf(dat,"RETR %s\r\n", User_Keyboard_MSG());
 						send(CTRL_SOCK, (uint8_t *)dat, strlen(dat));
 						break;
 					default:
-						printf("Command.First = default\r\n");
+						PRINTF("Command.First = default\r\n");
 						break;
 				}
 			}
@@ -227,36 +227,36 @@ uint8_t ftpc_run(uint8_t * dbuf)
     			{
     				if(ret==SOCK_BUSY) return 0;
     				if(ret < 0){
-    					printf("%d:recv() error:%ld\r\n",CTRL_SOCK,ret);
+    					PRINTF("%d:recv() error:%ld\r\n",CTRL_SOCK,ret);
     					close(CTRL_SOCK);
     					return ret;
     				}
     			}
-    			printf("Rcvd Command: %s\r\n", dbuf);
+    			PRINTF("Rcvd Command: %s\r\n", dbuf);
     			proc_ftpc((char *)dbuf);
     		}
     		break;
     	case SOCK_CLOSE_WAIT :
-    		printf("%d:CloseWait\r\n",CTRL_SOCK);
+    		PRINTF("%d:CloseWait\r\n",CTRL_SOCK);
     		if((ret=disconnect(CTRL_SOCK)) != SOCK_OK) return ret;
-    		printf("%d:Closed\r\n",CTRL_SOCK);
+    		PRINTF("%d:Closed\r\n",CTRL_SOCK);
     		break;
     	case SOCK_CLOSED :
-    		printf("%d:FTPStart\r\n",CTRL_SOCK);
+    		PRINTF("%d:FTPStart\r\n",CTRL_SOCK);
     		if((ret=socket(CTRL_SOCK, Sn_MR_TCP, FTP_destport, 0x0)) != CTRL_SOCK){
-    			printf("%d:socket() error:%ld\r\n", CTRL_SOCK, ret);
+    			PRINTF("%d:socket() error:%ld\r\n", CTRL_SOCK, ret);
     			close(CTRL_SOCK);
     			return ret;
     		}
     		break;
     	case SOCK_INIT :
-    		printf("%d:Opened\r\n",CTRL_SOCK);
+    		PRINTF("%d:Opened\r\n",CTRL_SOCK);
 			if((ret = connect(CTRL_SOCK, FTP_destip, FTP_destport)) != SOCK_OK){
-				printf("%d:Connect error\r\n",CTRL_SOCK);
+				PRINTF("%d:Connect error\r\n",CTRL_SOCK);
 				return ret;
 			}
 			connect_state_control_ftpc = 0;
-			printf("%d:Connectting...\r\n",CTRL_SOCK);
+			PRINTF("%d:Connectting...\r\n",CTRL_SOCK);
 			break;
     	default :
     		break;
@@ -265,15 +265,15 @@ uint8_t ftpc_run(uint8_t * dbuf)
     switch(getSn_SR(DATA_SOCK)){
     	case SOCK_ESTABLISHED :
     		if(!connect_state_data_ftpc){
-    			printf("%d:FTP Data socket Connected\r\n", DATA_SOCK);
+    			PRINTF("%d:FTP Data socket Connected\r\n", DATA_SOCK);
     			connect_state_data_ftpc = 1;
     		}
 			if(gDataPutGetStart){
 				switch(Command.Second){
 				case s_dir:
-					printf("dir waiting...\r\n");
+					PRINTF("dir waiting...\r\n");
 					if((size = getSn_RX_RSR(DATA_SOCK)) > 0){ // Don't need to check SOCKERR_BUSY because it doesn't not occur.
-						printf("ok\r\n");
+						PRINTF("ok\r\n");
 						memset(dbuf, 0, _MAX_SS);
 						if(size > _MAX_SS) size = _MAX_SS - 1;
 						ret = recv(DATA_SOCK,dbuf,size);
@@ -281,18 +281,18 @@ uint8_t ftpc_run(uint8_t * dbuf)
 						if(ret != size){
 							if(ret==SOCK_BUSY) return 0;
 							if(ret < 0){
-								printf("%d:recv() error:%ld\r\n",CTRL_SOCK,ret);
+								PRINTF("%d:recv() error:%ld\r\n",CTRL_SOCK,ret);
 								close(DATA_SOCK);
 								return ret;
 							}
 						}
-						printf("Rcvd Data:\n\r%s\n\r", dbuf);
+						PRINTF("Rcvd Data:\n\r%s\n\r", dbuf);
 						gDataPutGetStart = 0;
 						Command.Second = s_nocmd;
 					}
 					break;
 				case s_put:
-					printf("put waiting...\r\n");
+					PRINTF("put waiting...\r\n");
 					if(strlen(ftpc.workingdir) == 1)
 						sprintf(ftpc.filename, "/%s", (uint8_t *)gMsgBuf);
 					else
@@ -301,7 +301,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 					ftpc.fr = f_open(&(ftpc.fil), (const char *)ftpc.filename, FA_READ);
 					if(ftpc.fr == FR_OK){
 						remain_filesize = ftpc.fil.fsize;
-						printf("f_open return FR_OK\r\n");
+						PRINTF("f_open return FR_OK\r\n");
 						do{
 							memset(dbuf, 0, _MAX_SS);
 							if(remain_filesize > _MAX_SS)
@@ -312,15 +312,15 @@ uint8_t ftpc_run(uint8_t * dbuf)
 							if(ftpc.fr != FR_OK){
 								break;
 							}
-							printf("#");
+							PRINTF("#");
 							send(DATA_SOCK, dbuf, blocklen);
 							remain_filesize -= blocklen;
 						}while(remain_filesize != 0);
-						printf("\r\nFile read finished\r\n");
+						PRINTF("\r\nFile read finished\r\n");
 						ftpc.fr = f_close(&(ftpc.fil));
 					}
 					else{
-						printf("File Open Error: %d\r\n", ftpc.fr);
+						PRINTF("File Open Error: %d\r\n", ftpc.fr);
 						ftpc.fr = f_close(&(ftpc.fil));
 					}
 #else
@@ -328,7 +328,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 					do{
 						memset(dbuf, 0, _MAX_SS);
 						blocklen = sprintf(dbuf, "%s", ftpc.filename);
-						printf("########## dbuf:%s\r\n", dbuf);
+						PRINTF("########## dbuf:%s\r\n", dbuf);
 						send(DATA_SOCK, dbuf, blocklen);
 						remain_filesize -= blocklen;
 					}while(remain_filesize != 0);
@@ -338,7 +338,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 					disconnect(DATA_SOCK);
 					break;
 				case s_get:
-					printf("get waiting...\r\n");
+					PRINTF("get waiting...\r\n");
 					if(strlen(ftpc.workingdir) == 1)
 						sprintf(ftpc.filename, "/%s", (uint8_t *)gMsgBuf);
 					else
@@ -346,7 +346,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 #if defined(F_FILESYSTEM)
 					ftpc.fr = f_open(&(ftpc.fil), (const char *)ftpc.filename, FA_CREATE_ALWAYS | FA_WRITE);
 					if(ftpc.fr == FR_OK){
-						printf("f_open return FR_OK\r\n");
+						PRINTF("f_open return FR_OK\r\n");
 						while(1){
 							if((remain_datasize = getSn_RX_RSR(DATA_SOCK)) > 0){
 								while(1){
@@ -357,26 +357,26 @@ uint8_t ftpc_run(uint8_t * dbuf)
 									ftpc.fr = f_write(&(ftpc.fil), (const void *)dbuf, (UINT)ret, (UINT *)&blocklen);
 									remain_datasize -= blocklen;
 									if(ftpc.fr != FR_OK){
-										printf("f_write failed\r\n");
+										PRINTF("f_write failed\r\n");
 										break;
 									}
 									if(remain_datasize <= 0)	break;
 								}
 								if(ftpc.fr != FR_OK){
-									printf("f_write failed\r\n");
+									PRINTF("f_write failed\r\n");
 									break;
 								}
-								printf("#");
+								PRINTF("#");
 							}
 							else{
 								if(getSn_SR(DATA_SOCK) != SOCK_ESTABLISHED)	break;
 							}
 						}
-						printf("\r\nFile write finished\r\n");
+						PRINTF("\r\nFile write finished\r\n");
 						ftpc.fr = f_close(&(ftpc.fil));
 						gDataPutGetStart = 0;
 					}else{
-						printf("File Open Error: %d\r\n", ftpc.fr);
+						PRINTF("File Open Error: %d\r\n", ftpc.fr);
 					}
 #else
 					while(1){
@@ -388,7 +388,7 @@ uint8_t ftpc_run(uint8_t * dbuf)
 								else
 									recv_byte = remain_datasize;
 								ret = recv(DATA_SOCK, dbuf, recv_byte);
-								printf("########## dbuf:%s\r\n", dbuf);
+								PRINTF("########## dbuf:%s\r\n", dbuf);
 								remain_datasize -= ret;
 								if(remain_datasize <= 0)
 									break;
@@ -403,22 +403,22 @@ uint8_t ftpc_run(uint8_t * dbuf)
 #endif
 					break;
 				default:
-					printf("Command.Second = default\r\n");
+					PRINTF("Command.Second = default\r\n");
 					break;
 				}
 			}
     		break;
    		case SOCK_CLOSE_WAIT :
-   			printf("%d:CloseWait\r\n",DATA_SOCK);
+   			PRINTF("%d:CloseWait\r\n",DATA_SOCK);
 			if((ret=disconnect(DATA_SOCK)) != SOCK_OK) return ret;
-			printf("%d:Closed\r\n",DATA_SOCK);
+			PRINTF("%d:Closed\r\n",DATA_SOCK);
    			break;
    		case SOCK_CLOSED :
    			if(ftpc.dsock_state == DATASOCK_READY){
    				if(ftpc.dsock_mode == PASSIVE_MODE){
-   					printf("%d:FTPDataStart, port : %d\r\n",DATA_SOCK, local_port);
+   					PRINTF("%d:FTPDataStart, port : %d\r\n",DATA_SOCK, local_port);
    					if((ret=socket(DATA_SOCK, Sn_MR_TCP, local_port, 0x0)) != DATA_SOCK){
-   						printf("%d:socket() error:%ld\r\n", DATA_SOCK, ret);
+   						PRINTF("%d:socket() error:%ld\r\n", DATA_SOCK, ret);
    						close(DATA_SOCK);
    						return ret;
    					}
@@ -426,9 +426,9 @@ uint8_t ftpc_run(uint8_t * dbuf)
    					if(local_port > 50000)
    						local_port = 35000;
    				}else{
-   					printf("%d:FTPDataStart, port : %d\r\n",DATA_SOCK, local_port);
+   					PRINTF("%d:FTPDataStart, port : %d\r\n",DATA_SOCK, local_port);
    					if((ret=socket(DATA_SOCK, Sn_MR_TCP, local_port, 0x0)) != DATA_SOCK){
-   						printf("%d:socket() error:%ld\r\n", DATA_SOCK, ret);
+   						PRINTF("%d:socket() error:%ld\r\n", DATA_SOCK, ret);
    						close(DATA_SOCK);
    						return ret;
    					}
@@ -441,17 +441,17 @@ uint8_t ftpc_run(uint8_t * dbuf)
    			break;
 
    		case SOCK_INIT :
-   			printf("%d:Opened\r\n",DATA_SOCK);
+   			PRINTF("%d:Opened\r\n",DATA_SOCK);
    			if(ftpc.dsock_mode == ACTIVE_MODE){
    				if( (ret = listen(DATA_SOCK)) != SOCK_OK){
-   					printf("%d:Listen error\r\n",DATA_SOCK);
+   					PRINTF("%d:Listen error\r\n",DATA_SOCK);
    					return ret;
    				}
    				gDataSockReady = 1;
-   				printf("%d:Listen ok\r\n",DATA_SOCK);
+   				PRINTF("%d:Listen ok\r\n",DATA_SOCK);
    			}else{
    				if((ret = connect(DATA_SOCK, remote_ip.cVal, remote_port)) != SOCK_OK){
-   					printf("%d:Connect error\r\n", DATA_SOCK);
+   					PRINTF("%d:Connect error\r\n", DATA_SOCK);
    					return ret;
    				}
    				gDataSockReady = 1;
@@ -474,20 +474,20 @@ char proc_ftpc(char * buf)
 
 	switch(Responses){
 		case R_220:	/* Service ready for new user. */
-			printf("\r\nInput your User ID > ");
+			PRINTF("\r\nInput your User ID > ");
 			sprintf(dat,"USER %s\r\n", User_Keyboard_MSG());
-			printf("\r\n");
+			PRINTF("\r\n");
 			send(CTRL_SOCK, (uint8_t *)dat, strlen(dat));
 			break;
 
 		case R_331:	/* User name okay, need password. */
-			printf("\r\nInput your Password > ");
+			PRINTF("\r\nInput your Password > ");
 			sprintf(dat,"PASS %s\r\n", User_Keyboard_MSG());
-			printf("\r\n");
+			PRINTF("\r\n");
 			send(CTRL_SOCK, (uint8_t *)dat, strlen(dat));
 			break;
 		case R_230:	/* User logged in, proceed */
-			printf("\r\nUser logged in, proceed\r\n");
+			PRINTF("\r\nUser logged in, proceed\r\n");
 
 			sprintf(dat,"TYPE %c\r\n", TransferAscii);
 			ftpc.type = ASCII_TYPE;
@@ -520,7 +520,7 @@ char proc_ftpc(char * buf)
 				gDataPutGetStart = 1;
 				break;
 			default :
-				printf("Command.First = default\r\n");
+				PRINTF("Command.First = default\r\n");
 				break;
 			}
 			break;
@@ -529,16 +529,16 @@ char proc_ftpc(char * buf)
 			break;
 		case R_227:
 			if (pportc(buf) == -1){
-				printf("Bad port syntax\r\n");
+				PRINTF("Bad port syntax\r\n");
 			}
 			else{
-				printf("Go Open Data Sock...\r\n ");
+				PRINTF("Go Open Data Sock...\r\n ");
 				ftpc.dsock_mode = PASSIVE_MODE;
 				ftpc.dsock_state = DATASOCK_READY;
 			}
 			break;
 		default:
-			printf("\r\nDefault Status = %d\r\n",(uint16_t)Responses);
+			PRINTF("\r\nDefault Status = %d\r\n",(uint16_t)Responses);
 			gDataSockReady = 1;
 			break;
 		}
@@ -555,7 +555,7 @@ int pportc(char * arg)
 		else	 tok = strtok(NULL,",");
 		remote_ip.cVal[i] = (uint8_t)atoi(tok, 10);
 		if (!tok){
-			printf("bad pport : %s\r\n", arg);
+			PRINTF("bad pport : %s\r\n", arg);
 			return -1;
 		}
 	}
@@ -565,11 +565,11 @@ int pportc(char * arg)
 		remote_port <<= 8;
 		remote_port += atoi(tok, 10);
 		if (!tok){
-			printf("bad pport : %s\r\n", arg);
+			PRINTF("bad pport : %s\r\n", arg);
 			return -1;
 		}
 	}
-	printf("ip : %d.%d.%d.%d, port : %d\r\n", remote_ip.cVal[0], remote_ip.cVal[1], remote_ip.cVal[2], remote_ip.cVal[3], remote_port);
+	PRINTF("ip : %d.%d.%d.%d, port : %d\r\n", remote_ip.cVal[0], remote_ip.cVal[1], remote_ip.cVal[2], remote_ip.cVal[3], remote_port);
 	return 0;
 }
 uint8_t* User_Keyboard_MSG()
